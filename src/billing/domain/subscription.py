@@ -1,7 +1,8 @@
 from enum import Enum
 
 class Subscription:
-    pass
+    def __init__(self):
+        self.status = SubscriptionStatus.INACTIVE
 
 class SubscriptionStatus(Enum):
     ACTIVE = "active"
