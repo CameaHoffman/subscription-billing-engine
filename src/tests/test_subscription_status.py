@@ -32,3 +32,21 @@ def test_subscription_has_plan_id():
                        plan_id="plan_123",
                        )
     assert sub.plan_id == "plan_123"
+
+def test_subscription_has_current_period_start_date():
+    start = date(2026, 1 ,1)
+    sub = Subscription(customer_id="cust_123", 
+                       start_date=start,
+                       plan_id="plan_123",
+    )
+    
+    assert sub.current_period_start_date == start
+
+def test_subscription_has_current_period_end_date():
+    start = date(2026, 1, 1)
+    sub = Subscription(customer_id="cust_123", 
+                       start_date=start,
+                       plan_id="plan_123",
+                       )
+
+    assert sub.current_period_end_date == start + timedelta(30)
