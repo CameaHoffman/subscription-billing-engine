@@ -50,3 +50,13 @@ def test_subscription_has_current_period_end_date():
                        )
 
     assert sub.current_period_end_date == start + timedelta(30)
+
+def test_subscription_cancels_at_period_end():
+    start = date(2026, 1, 1)
+    sub = Subscription(customer_id="cust_123", 
+                       start_date=start,
+                       plan_id="plan_123",
+                       )
+    sub.cancel()
+
+    assert sub.cancel_at_period_end is True

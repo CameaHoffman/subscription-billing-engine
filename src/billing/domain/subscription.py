@@ -20,3 +20,7 @@ class Subscription:
         self.plan_id = plan_id
         self.current_period_start_date = start_date
         self.current_period_end_date = self.current_period_start_date + timedelta(days=30)
+        self.cancel_at_period_end = False
+
+    def cancel(self):
+        self.cancel_at_period_end = True
