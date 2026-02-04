@@ -89,5 +89,48 @@ def test_subscription_cancels_at_period_end():
 
     assert sub.cancel_at_period_end is True
 
+# ------ Advance To ------
 
+def test_advance_to_does_nothing_before_start_date():
+    start = date(2026, 1, 1)
+    before_start = date(2025, 12, 15)
 
+    sub = Subscription(customer_id="cust_123", 
+                       start_date=start,
+                       plan_id="plan_123",
+                       )
+    
+    original_end_date = sub.current_period_end_date
+
+    sub.advance_to(before_start)
+
+    assert sub.current_period_end_date == original_end_date
+
+def test_advance_to_does_nothing_within_current_period():
+    start = date(2026, 1, 1)
+    day_in_current_period = date(2026, 1, 15)
+
+    sub = Subscription(customer_id="cust_123",
+                       start_date=start,
+                       plan_id="plan_123")
+    
+    original_end_date = sub.current_period_end_date
+    
+    sub.advance_to(day_in_current_period)
+
+    assert sub.current_period_end_date == original_end_date
+
+def test_advance_to_advances_when_past_period_end():
+    start = date(2026, 1, 1)
+    day_in_next_period = date(2026, 2, 15)
+
+    sub = Subscription(customer_id="cust_123",
+                       start_date=start,
+                       plan_id="plan_123")
+    
+    new_start_date = sub.current_period_end_date + timedelta(days=1)
+    new_end_date = new_start_date + timedelta(days=30)
+    
+    sub.advance_to(day_in_next_period)
+
+    assert sub.current_period_end_date == new_end_date
