@@ -162,3 +162,4 @@ def test_advance_to_does_not_extend_past_period_end_when_canceled_at_period_end(
     sub.advance_to(far_future)
 
     assert sub.current_period_end_date == final_end
+
