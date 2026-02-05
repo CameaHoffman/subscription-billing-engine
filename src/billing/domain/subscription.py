@@ -31,10 +31,10 @@ class Subscription:
     
         if on_date < self.start_date:
             return None
-        if on_date > self.current_period_end_date:
+        
+        while on_date > self.current_period_end_date:
             self.current_period_start_date = self.current_period_end_date + timedelta(days=1)
             self.current_period_end_date = self.current_period_start_date + timedelta(days=30)
-            return None
             
     def cancel(self):
         self.cancel_at_period_end = True
