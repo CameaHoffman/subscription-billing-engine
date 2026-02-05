@@ -30,11 +30,15 @@ class Subscription:
     def advance_to(self, on_date: date) -> None:
     
         if on_date < self.start_date:
-            return None
+            return
         
         while on_date > self.current_period_end_date:
+            if self.cancel_at_period_end:
+                return
+
             self.current_period_start_date = self.current_period_end_date + timedelta(days=1)
             self.current_period_end_date = self.current_period_start_date + timedelta(days=30)
             
     def cancel(self):
         self.cancel_at_period_end = True
+

@@ -147,3 +147,18 @@ def test_advance_to_advances_multiple_periods_when_on_date_far_in_future():
     sub.advance_to(six_months_later)
 
     assert sub.current_period_start_date <= six_months_later <= sub.current_period_end_date
+
+def test_advance_to_does_not_extend_past_period_end_when_canceled_at_period_end():
+    start = date(2026, 1, 1)
+    far_future = date(2026, 6, 15)
+
+    sub = Subscription(customer_id="cust_123",
+                       start_date=start,
+                       plan_id="plan_123")
+    
+    final_end = sub.current_period_end_date
+    
+    sub.cancel()
+    sub.advance_to(far_future)
+
+    assert sub.current_period_end_date == final_end
