@@ -28,3 +28,24 @@ def test_billingengine_generates_invoice_from_current_subscription_billing_perio
     assert invoice.amount == plan.amount
     assert invoice.period_start == sub.current_period_start_date
     assert invoice.period_end == sub.current_period_end_date
+
+def test_billingengine_does_not_generate_invoice_on_inactive_subscription():
+    start_date = date(2026, 1, 1)
+    billing_date = date(2026, 2, 15)
+
+    plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
+
+    sub = Subscription(
+        customer_id="cust_123",
+        start_date=start_date,
+        plan=plan,
+        )
+    
+    sub.status = SubscriptionStatus.INACTIVE
+
+    engine = BillingEngine()
+    
+    invoice = engine.generate_invoice(subscription=sub, as_of_date=billing_date)
+
+    assert invoice is None
+
