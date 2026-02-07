@@ -216,7 +216,7 @@ def test_advance_to_advances_when_past_period_end():
         start_date=start,
         plan=plan)
     
-    new_start_date = sub.current_period_end_date + timedelta(days=1)
+    new_start_date = sub.current_period_end_date
     new_end_date = new_start_date + timedelta(days=plan.period_days)
     
     sub.advance_to(day_in_next_period)

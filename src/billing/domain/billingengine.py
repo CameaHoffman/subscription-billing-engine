@@ -15,6 +15,18 @@ class BillingEngine:
         if subscription.status != SubscriptionStatus.ACTIVE:
             return None
         
+        subscription.advance_to(as_of_date)
+        
+        if not (subscription.current_period_start_date <= as_of_date <= subscription.current_period_end_date):
+            return None
+        
+        period_key = subscription.current_period_start_date
+
+        if period_key in subscription.invoiced_periods:
+            return None
+
+        subscription.invoiced_periods.add(period_key)
+
         return Invoice(
             invoice_id="inv_123", # invoice_id will be assigned by persistence layer later
             customer_id=subscription.customer_id,
