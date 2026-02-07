@@ -94,4 +94,44 @@ def test_billingengine_returns_none_when_as_of_date_outside_billing_period():
 
     assert invoice is None
     
+def test_billingengine_returns_invoice_in_billing_period_after_cancelling_subscritpion():
+    start_date = date(2026, 1, 1)
+    billing_date = date(2026, 1, 15)
 
+    plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
+
+    sub = Subscription(
+        customer_id="cust_123",
+        start_date=start_date,
+        plan=plan,
+        )
+    sub.status = SubscriptionStatus.ACTIVE
+    
+    sub.cancel()
+
+    engine = BillingEngine()
+    
+    invoice = engine.generate_invoice(subscription=sub, as_of_date=billing_date)
+
+    assert isinstance(invoice, Invoice)
+
+def test_billingengine_returns_none_after_cancelled_subscription_reaches_period_end():
+    start_date = date(2026, 1, 1)
+    future_date = date(2026, 3, 1)
+
+    plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
+
+    sub = Subscription(
+        customer_id="cust_123",
+        start_date=start_date,
+        plan=plan,
+        )
+    sub.status = SubscriptionStatus.ACTIVE
+    
+    sub.cancel()
+
+    engine = BillingEngine()
+    
+    invoice = engine.generate_invoice(subscription=sub, as_of_date=future_date)
+
+    assert invoice is None
