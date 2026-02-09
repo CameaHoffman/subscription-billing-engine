@@ -22,3 +22,6 @@ class LineItem:
     
     def __str__(self):
         return f"Your {self.description} is ${self.amount:.2f} x {self.quantity}, with a subtotal of ${self.subtotal:.2f}."
+
+    def __repr__(self):
+        return f"LineItem(description='{self.description}', amount={self.amount:.2f}, quantity={self.quantity}, subtotal={self.subtotal})"
