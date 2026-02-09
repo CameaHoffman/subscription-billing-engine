@@ -30,7 +30,7 @@ def test_line_item_returns_str():
 
     assert str(item) == "Your plan charge is $100.00 x 3, with a subtotal of $300.00."
 
-def test_repr_returns_simple_str_for_developers():
+def test_line_item_repr_returns_simple_str_for_developers():
     item = LineItem(
         description= "plan charge",
         amount=Decimal("100.00"),

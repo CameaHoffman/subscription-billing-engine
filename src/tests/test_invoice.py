@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from billing.domain.invoice import Invoice, InvoiceStatus
+from billing.domain.line_item import LineItem
 
 def test_invoice_created_with_correct_data():
     invoice = Invoice(
@@ -17,3 +18,29 @@ def test_invoice_created_with_correct_data():
     assert invoice.period_start == date(2026, 1, 1)
     assert invoice.period_end == date(2026, 1, 31)
     assert invoice.status == InvoiceStatus.UNPAID
+
+def test_invoice_accepts_line_items():
+    item_1 = LineItem(
+        description= "plan charge",
+        amount=Decimal("100.00"),
+        quantity=1
+    )
+
+    item_2 = LineItem(
+        description= "additional plan charge",
+        amount=Decimal("10.00"),
+        quantity=3
+    )
+
+    invoice = Invoice(
+        invoice_id = "invoice_123",
+        customer_id = "customer_123",
+        amount = Decimal("120.00"),
+        period_start = date(2026, 1, 1),
+        period_end = date(2026, 1, 31),
+        line_items = [item_1, item_2]
+                      )
+    
+    assert invoice.line_items == [item_1, item_2]
+    
+
