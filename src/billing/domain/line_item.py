@@ -19,3 +19,6 @@ class LineItem:
     @property
     def subtotal(self):
         return self.amount * self.quantity
+    
+    def __str__(self):
+        return f"Your {self.description} is ${self.amount:.2f} x {self.quantity}, with a subtotal of ${self.subtotal:.2f}."
