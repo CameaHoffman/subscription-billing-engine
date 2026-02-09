@@ -16,3 +16,6 @@ class LineItem:
         self.amount = amount
         self.quantity = quantity
     
+    @property
+    def subtotal(self):
+        return self.amount * self.quantity
