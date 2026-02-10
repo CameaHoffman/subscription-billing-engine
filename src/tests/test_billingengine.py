@@ -26,7 +26,9 @@ def test_billingengine_generates_invoice_from_current_subscription_billing_perio
     assert sub.current_period_start_date in sub.invoiced_periods
     assert isinstance(invoice, Invoice)
     assert invoice.customer_id == "cust_123"
-    assert invoice.amount == plan.amount
+    assert invoice.total == plan.amount
+    assert len(invoice.line_items) == 1
+    assert invoice.line_items[0].amount == plan.amount
     assert invoice.period_start == sub.current_period_start_date
     assert invoice.period_end == sub.current_period_end_date
 
