@@ -4,6 +4,7 @@ from billing.domain.invoice import Invoice
 from billing.domain.subscription import Subscription, SubscriptionStatus
 from billing.domain.plan import Plan
 from billing.domain.billingengine import BillingEngine
+from billing.domain.billingengine import LineItem
 
 def test_billingengine_generates_invoice_from_current_subscription_billing_period():
     start_date = date(2026, 1, 1)
@@ -137,3 +138,30 @@ def test_billingengine_returns_none_after_cancelled_subscription_reaches_period_
     invoice = engine.generate_invoice(subscription=sub, as_of_date=future_date)
 
     assert invoice is None
+
+def test_billingengine_generates_invoice_with_single_plan_line_item():
+    start_date = date(2026, 1, 1)
+    billing_date = date(2026, 1, 15)
+
+    plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
+
+    sub = Subscription(
+        customer_id="cust_123",
+        start_date=start_date,
+        plan=plan,
+        )
+    
+    sub.status = SubscriptionStatus.ACTIVE
+
+    engine = BillingEngine()
+    invoice = engine.generate_invoice(subscription=sub, as_of_date=billing_date)
+
+    assert isinstance(invoice, Invoice)
+    assert len(invoice.line_items) == 1
+
+    item = invoice.line_items[0]
+    assert item.description == "plan charge"
+    assert item.amount == Decimal("100.00")
+    assert item.quantity == 1
+
+    assert invoice.total == plan.amount
