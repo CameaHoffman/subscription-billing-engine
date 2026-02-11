@@ -159,6 +159,28 @@ def test_subscription_cancels_at_period_end():
 
     assert sub.cancel_at_period_end is True
 
+def test_cancel_immediately_sets_inactive_and_ends_now():
+    start = date(2026, 1, 1)
+
+    plan = Plan(
+        plan_id="plan_123",
+        period_days=30,
+        amount=Decimal("100.00")
+        )
+    
+    sub = Subscription(
+        customer_id="cust_123", 
+        start_date=start,
+        plan=plan,
+        )
+    
+    canceled_at = date(2026, 1, 10)
+    sub.cancel_immediately(canceled_at)
+
+    assert sub.status == SubscriptionStatus.INACTIVE
+    assert sub.current_period_end_date == canceled_at
+    assert sub.cancel_at_period_end is False
+    
 # ------ Advance To ------
 
 def test_advance_to_does_nothing_before_start_date():

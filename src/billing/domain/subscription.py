@@ -50,3 +50,8 @@ class Subscription:
     def cancel(self):
         self.cancel_at_period_end = True
 
+    def cancel_immediately(self, canceled_at: date):
+        self.status = SubscriptionStatus.INACTIVE
+        self.current_period_end_date = canceled_at
+        self.cancel_at_period_end = False
+
