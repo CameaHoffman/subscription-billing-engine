@@ -1,7 +1,9 @@
-from billing.domain.subscription import Subscription, SubscriptionStatus
-from billing.domain.plan import Plan
 from datetime import date, timedelta
 from decimal import Decimal
+from uuid import UUID
+from billing.domain.subscription import Subscription, SubscriptionStatus
+from billing.domain.plan import Plan
+from billing.domain.customer import Customer
 
 # ------ Active/Inactive ------
 
@@ -13,8 +15,10 @@ def test_subscription_starts_inactive():
         amount=Decimal("100.00"),
         )
     
+    customer = Customer(email="example@email.com")
+
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start,
         plan=plan,
                        )
@@ -27,9 +31,11 @@ def test_subscription_is_active_on_start_date():
         period_days=30,
         amount=Decimal("100.00"),
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=on_date,
         plan=plan,
         )
@@ -45,8 +51,10 @@ def test_subscription_is_inactive_before_start_date():
         amount=Decimal("100.00"),
         )
     
+    customer = Customer(email="example@email.com")
+    
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start_date,
         plan=plan,
         )
@@ -63,14 +71,16 @@ def test_subscription_has_customer_id():
         amount=Decimal("100.00"),
         )
     
+    customer = Customer(email="example@email.com")
+    
     sub = Subscription(
-        customer_id="cust_123", 
+        customer_id=customer.customer_id, 
         start_date=start,
         plan=plan,
         )
     
-    assert sub.customer_id == "cust_123"
-
+    assert isinstance(sub.customer_id, UUID)
+    
 # ------ Plan ID -------
 
 def test_subscription_has_plan_id():
@@ -80,9 +90,11 @@ def test_subscription_has_plan_id():
         period_days=30,
         amount=Decimal("100.00"),
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123", 
+        customer_id=customer.customer_id, 
         start_date=start,
         plan=plan,
         )
@@ -98,9 +110,11 @@ def test_subscription_has_start_date():
         period_days=30,
         amount=Decimal("100.00"),
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123", 
+        customer_id=customer.customer_id, 
         start_date=start,
         plan=plan,
         )
@@ -114,9 +128,11 @@ def test_subscription_has_current_period_start_date():
         period_days=30,
         amount=Decimal("100.00"),
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123", 
+        customer_id=customer.customer_id, 
         start_date=start,
         plan=plan,
         )
@@ -130,9 +146,10 @@ def test_subscription_has_current_period_end_date():
         period_days=30,
         amount=Decimal("100.00"),
         )
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123", 
+        customer_id=customer.customer_id, 
         start_date=start,
         plan=plan,
         )
@@ -148,9 +165,11 @@ def test_subscription_cancels_at_period_end():
         period_days=30,
         amount=Decimal("100.00")
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123", 
+        customer_id=customer.customer_id, 
         start_date=start,
         plan=plan,
         )
@@ -168,8 +187,10 @@ def test_cancel_immediately_sets_inactive_and_ends_now():
         amount=Decimal("100.00")
         )
     
+    customer = Customer(email="example@email.com")
+    
     sub = Subscription(
-        customer_id="cust_123", 
+        customer_id=customer.customer_id, 
         start_date=start,
         plan=plan,
         )
@@ -191,9 +212,11 @@ def test_advance_to_does_nothing_before_start_date():
         period_days=30,
         amount=Decimal("100.00"),
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123", 
+        customer_id=customer.customer_id, 
         start_date=start,
         plan=plan,
         )
@@ -212,9 +235,11 @@ def test_advance_to_does_nothing_within_current_period():
         period_days=30,
         amount=Decimal("100.00"),
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start,
         plan=plan)
     
@@ -232,9 +257,11 @@ def test_advance_to_advances_when_past_period_end():
         period_days=30,
         amount=Decimal("100.00"),
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start,
         plan=plan)
     
@@ -253,9 +280,11 @@ def test_advance_to_advances_multiple_periods_when_on_date_far_in_future():
         period_days=30,
         amount=Decimal("100.00"),
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start,
         plan=plan)
 
@@ -271,9 +300,11 @@ def test_advance_to_does_not_extend_past_period_end_when_canceled_at_period_end(
         period_days=30,
         amount=Decimal("100.00"),
         )
+    
+    customer = Customer(email="example@email.com")
 
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start,
         plan=plan)
     

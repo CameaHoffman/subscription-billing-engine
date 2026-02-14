@@ -5,6 +5,7 @@ from enum import Enum
 from decimal import Decimal
 from datetime import date
 from typing import Optional, List
+from uuid import UUID
 from billing.domain.line_item import LineItem
 
 class InvoiceStatus(Enum):
@@ -18,7 +19,7 @@ class Invoice:
     def __init__(
             self,
             invoice_id: str,
-            customer_id: str,
+            customer_id: UUID,
             period_start: date,
             period_end: date,
             status: InvoiceStatus = InvoiceStatus.UNPAID,

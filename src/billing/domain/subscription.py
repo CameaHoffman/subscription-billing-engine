@@ -5,6 +5,7 @@ Domain models for subscription billing.
 from enum import Enum
 from datetime import date, timedelta
 from billing.domain.plan import Plan
+from uuid import UUID
 
 class SubscriptionStatus(Enum):
     ACTIVE = "active"
@@ -14,7 +15,7 @@ class Subscription:
     """
     Represents a customer's subscription and billing period.
     """
-    def __init__(self, customer_id: str, start_date: date, plan: Plan, invoiced_periods: set[date] | None = None):
+    def __init__(self, customer_id: UUID, start_date: date, plan: Plan, invoiced_periods: set[date] | None = None):
         self.status = SubscriptionStatus.INACTIVE
         self.customer_id = customer_id
         self.start_date = start_date

@@ -1,10 +1,11 @@
 from datetime import date
 from decimal import Decimal
+from uuid import UUID
 from billing.domain.invoice import Invoice
 from billing.domain.subscription import Subscription, SubscriptionStatus
 from billing.domain.plan import Plan
 from billing.domain.billingengine import BillingEngine
-from billing.domain.billingengine import LineItem
+from billing.domain.customer import Customer
 
 def test_billingengine_generates_invoice_from_current_subscription_billing_period():
     start_date = date(2026, 1, 1)
@@ -12,8 +13,10 @@ def test_billingengine_generates_invoice_from_current_subscription_billing_perio
 
     plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
 
+    customer = Customer(email="example@email.com")
+
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start_date,
         plan=plan,
         )
@@ -26,7 +29,8 @@ def test_billingengine_generates_invoice_from_current_subscription_billing_perio
     
     assert sub.current_period_start_date in sub.invoiced_periods
     assert isinstance(invoice, Invoice)
-    assert invoice.customer_id == "cust_123"
+    assert isinstance(invoice.customer_id, UUID)
+    assert invoice.customer_id == customer.customer_id
     assert invoice.total == plan.amount
     assert len(invoice.line_items) == 1
     assert invoice.line_items[0].amount == plan.amount
@@ -39,8 +43,10 @@ def test_billingengine_does_not_generate_invoice_on_inactive_subscription():
 
     plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
 
+    customer = Customer(email="example@email.com")
+
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start_date,
         plan=plan,
         )
@@ -58,10 +64,12 @@ def test_billingengine_returns_none_on_duplicate_invoice_for_same_period():
     billing_date = date(2026, 1, 15)
     second_billing_date = date(2026, 1, 16)
 
+    customer = Customer(email="example@email.com")
+
     plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
 
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start_date,
         plan=plan,
         )
@@ -83,8 +91,10 @@ def test_billingengine_returns_none_when_as_of_date_outside_billing_period():
 
     plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
 
+    customer = Customer(email="example@email.com")
+
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start_date,
         plan=plan,
         )
@@ -97,14 +107,16 @@ def test_billingengine_returns_none_when_as_of_date_outside_billing_period():
 
     assert invoice is None
     
-def test_billingengine_returns_invoice_in_billing_period_after_cancelling_subscritpion():
+def test_billingengine_returns_invoice_in_billing_period_after_cancelling_subscription():
     start_date = date(2026, 1, 1)
     billing_date = date(2026, 1, 15)
 
     plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
 
+    customer = Customer(email="example@email.com")
+
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start_date,
         plan=plan,
         )
@@ -124,8 +136,10 @@ def test_billingengine_returns_none_after_cancelled_subscription_reaches_period_
 
     plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
 
+    customer = Customer(email="example@email.com")
+
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start_date,
         plan=plan,
         )
@@ -145,8 +159,10 @@ def test_billingengine_generates_invoice_with_single_plan_line_item():
 
     plan = Plan(plan_id="plan_123", period_days=30, amount=Decimal("100.00"))
 
+    customer = Customer(email="example@email.com")
+
     sub = Subscription(
-        customer_id="cust_123",
+        customer_id=customer.customer_id,
         start_date=start_date,
         plan=plan,
         )
