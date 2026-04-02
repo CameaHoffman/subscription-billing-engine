@@ -4,6 +4,7 @@ Domain models for generating client invoices.
 
 from datetime import date
 from typing import Optional
+from uuid import uuid4
 from billing.domain.invoice import Invoice
 from billing.domain.subscription import Subscription, SubscriptionStatus
 from billing.domain.line_item import LineItem
@@ -35,6 +36,7 @@ class BillingEngine:
             period_end=subscription.current_period_end_date,
             line_items=[
                 LineItem(
+                    line_item_id=str(uuid4()),
                     description="plan charge",
                     amount=subscription.plan.amount,
                     quantity=1

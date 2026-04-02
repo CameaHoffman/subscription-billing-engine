@@ -7,7 +7,13 @@ class Plan:
     """
     Represents a customer's subscription plan.
     """
-    def __init__(self, plan_id: str, period_days: int, amount: Decimal):
+    def __init__(
+            self,
+            plan_id: str,
+            period_days: int,
+            amount: Decimal
+            ):
+        
         if period_days <= 0:
             raise ValueError("period_days must be a positive integer")
         

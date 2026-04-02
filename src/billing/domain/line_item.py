@@ -10,8 +10,15 @@ class LineItem:
     Represents an billing item from a line on a client invoice.
     """
 
-    def __init__(self, description: str, amount: Decimal, quantity: int = 1):
-        
+    def __init__(
+            self, 
+            line_item_id: str,
+            description: str,
+            amount: Decimal,
+            quantity: int = 1
+            ):
+
+        self.line_item_id = line_item_id
         self.description = description
         self.amount = amount
         self.quantity = quantity
