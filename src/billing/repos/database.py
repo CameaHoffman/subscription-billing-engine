@@ -13,7 +13,7 @@ def init_db():
 
         cursor.execute("""
                        CREATE TABLE IF NOT EXISTS customers (
-                       customer_id UUID PRIMARY KEY,
+                       customer_id TEXT PRIMARY KEY,
                        email TEXT NOT NULL UNIQUE,
                        first_name TEXT,
                        last_name TEXT,
@@ -23,7 +23,8 @@ def init_db():
         
         cursor.execute("""
                        CREATE TABLE IF NOT EXISTS plans (
-                       plan_id UUID PRIMARY KEY,
+                       plan_id TEXT PRIMARY KEY,
+                       plan_name TEXT,
                        period_days INTEGER NOT NULL,
                        amount DECIMAL
                        )
@@ -31,31 +32,32 @@ def init_db():
         
         cursor.execute("""
                        CREATE TABLE IF NOT EXISTS subscriptions (
-                       subscription_id UUID PRIMARY KEY,
-                       customer_id UUID FOREIGN KEY REFERENCES customers(customer_id),
+                       subscription_id TEXT PRIMARY KEY,
+                       customer_id TEXT NOT NULL,
                        start_date TIMESTAMP,
-                       plan UUID FOREIGN KEY REFERENCES plans(plan_id),
-                       invoice_periods INTEGER TIMESTAMP FOREIGN 
-                       KEY REFERENCES invoices(invoice_periods)
+                       plan_id TEXT NOT NULL,
+                       FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+                       FOREIGN KEY (plan_id) REFERENCES plans(plan_id)
                        )
                        """)
         
         cursor.execute("""
                        CREATE TABLE IF NOT EXISTS invoices (
                        invoice_id TEXT PRIMARY KEY,
-                       customer_id UUID FOREIGN KEY REFERENCES customers(customer_id),
+                       customer_id TEXT NOT NULL,
                        period_start TIMESTAMP,
                        period_end TIMESTAMP,
                        status TEXT,
-                       line_items TEXT FOREIGN KEY REFERENCES line_items(LineItem)
-                       )
+                       FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
                        """)
         
         cursor.execute("""
                        CREATE TABLE IF NOT EXISTS line_items (
                        line_item_id TEXT NOT NULL PRIMARY KEY,
+                       invoice_id TEXT,
                        description TEXT,
                        amount DECIMAL,
-                       quantity INTEGER
+                       quantity INTEGER,
+                       FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id)
                        )
                        """)

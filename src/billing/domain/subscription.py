@@ -22,7 +22,6 @@ class Subscription:
             customer: Customer,
             start_date: date,
             plan: Plan,
-            invoiced_periods: set[date] | None = None
             ):
         
         self.subscription_id = subscription_id or uuid4()
@@ -35,6 +34,7 @@ class Subscription:
         
         self.plan = plan
         self.plan_id = plan.plan_id
+        self.plan_name = plan.plan_name
 
         self.current_period_start_date = start_date
         self.current_period_end_date = (
@@ -42,8 +42,6 @@ class Subscription:
         )
         
         self.cancel_at_period_end = False
-
-        self.invoiced_periods = invoiced_periods or set()
         
     def is_active(self, on_date: date | None = None) -> bool:
         on_date = on_date or date.today()

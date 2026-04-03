@@ -13,6 +13,7 @@ class BillingEngine:
     """
     Decides whether an invoice should be generated for a subscription.
     """
+
     def generate_invoice(self, subscription: Subscription, as_of_date: date) -> Optional[Invoice]:
         if subscription.status != SubscriptionStatus.ACTIVE:
             return None
@@ -21,19 +22,14 @@ class BillingEngine:
         
         if not (subscription.current_period_start_date <= as_of_date <= subscription.current_period_end_date):
             return None
-        
-        period_key = subscription.current_period_start_date
-
-        if period_key in subscription.invoiced_periods:
-            return None
-
-        subscription.invoiced_periods.add(period_key)
 
         return Invoice(
-            invoice_id="inv_123", # invoice_id will be assigned by persistence layer later
-            customer_id=subscription.customer_id,
+            invoice_id="inv_123", # temporary placeholder until invoice persistence is implemented
+            customer=subscription.customer,
             period_start=subscription.current_period_start_date,
             period_end=subscription.current_period_end_date,
+            plan_id=subscription.plan_id,
+            plan_name=subscription.plan_name,
             line_items=[
                 LineItem(
                     line_item_id=str(uuid4()),
