@@ -17,7 +17,7 @@ def init_db():
                        email TEXT NOT NULL UNIQUE,
                        first_name TEXT,
                        last_name TEXT,
-                       created_at TIMESTAMP
+                       created_at TIMESTAMP DEFAULT CURRENT TIMESTAMP
                        )
         """)
         
@@ -49,6 +49,7 @@ def init_db():
                        period_end TIMESTAMP,
                        status TEXT,
                        FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+                       )
                        """)
         
         cursor.execute("""
