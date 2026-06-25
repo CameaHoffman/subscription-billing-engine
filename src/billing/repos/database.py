@@ -17,7 +17,7 @@ def init_db():
                        email TEXT NOT NULL UNIQUE,
                        first_name TEXT,
                        last_name TEXT,
-                       created_at TIMESTAMP DEFAULT CURRENT TIMESTAMP
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                        )
         """)
         
