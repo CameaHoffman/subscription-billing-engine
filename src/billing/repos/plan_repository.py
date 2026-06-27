@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 from uuid import UUID, uuid4
 from decimal import Decimal
-from customer_repository import SQLiteCustomerRepository
+from billing.repos.customer_repository import SQLiteCustomerRepository
 
 from billing.repos.database import get_connection
 
@@ -19,13 +19,27 @@ class SQLitePlanRepository:
 
     def create(
             self,
-            plan_id: str | UUID,
             plan_name: str,
             period_days: int,
             amount: Decimal,
             ) -> PlanRecord:
         
         plan_id = uuid4()
+
+        if not plan_name:
+                raise ValueError("Field can not be empty.")
+
+        if not period_days:
+            raise ValueError("Field can not be empty.")
+            
+        if period_days <= 0:
+            raise ValueError("Field needs to be greater than zero.")
+            
+        if not amount:
+            raise ValueError("Field can not empty.")
+            
+        if amount <= 0:
+            raise ValueError("Field needs to be greater than zero.")
 
         with get_connection() as conn:
             cursor = conn.cursor()
@@ -35,19 +49,22 @@ class SQLitePlanRepository:
                 INSERT INTO plans (plan_id, plan_name, period_days, amount)
                 VALUES (?, ?, ?, ?)
                 """,
-                (str(plan_id), plan_name, period_days, amount)
-                )
-    
+                (str(plan_id), plan_name, period_days, str(amount))
+            )
+
             conn.commit()
 
         created = self.get(plan_id)
-        assert plan_id is not None
+        assert created is not None
         return created
 
     def get(self, plan_id: str | UUID) -> PlanRecord:
         
         with get_connection() as conn:
             cursor = conn.cursor()
+
+            if not plan_id:
+                raise ValueError("Plan ID not valid.")
 
             cursor.execute(
                 """
@@ -96,36 +113,46 @@ class SQLitePlanRepository:
         ]
     
     def update(
-            self, plan_id: str | UUID,
-            plan_name: Optional[str],
-            period_days: Optional[int],
-            amount: Optional[Decimal]
-            ):
+            self, 
+            plan_id: str | UUID,
+            plan_name: Optional[str] = None,
+            period_days: Optional[int] = None,
+            amount: Optional[Decimal] = None,
+    ) -> Optional[PlanRecord]:
         
-        existing_plan = self.get(plan_id)
+            existing_plan = self.get(plan_id)
 
-        if existing_plan is None:
-            return None
+            if existing_plan is None:
+                return None
+
+            updated_plan_name = plan_name if plan_name is not None else existing_plan.plan_name
+            updated_period_days = period_days if period_days is not None else existing_plan.period_days
+            updated_amount = amount if amount is not None else existing_plan.amount
+
+            if not updated_plan_name:
+                raise ValueError("Invalid plan name.")
+            
+            if not updated_period_days:
+                raise ValueError("Invalid entry.")
+            
+            if updated_amount <= 0:
+                raise ValueError("Amount must be greater than zero.")
         
-        updated_plan_name = plan_name if plan_name is not None else existing_plan.plan_name
-        updated_period_days = period_days if period_days is not None else existing_plan.period_days
-        updated_amount = amount if amount is not None else existing_plan.amount
-        
-        with get_connection() as conn:
-            cursor = conn.cursor()
+            with get_connection() as conn:
+                cursor = conn.cursor()
 
-            cursor.execute(
-                """
-                UPDATE plans
-                SET (plan_name = ?, period_days = ?, amount = ?)
-                WHERE plan_id = ?
-                """,
-                (updated_plan_name, updated_period_days, updated_amount, str(plan_id)),
-            )
+                cursor.execute(
+                    """
+                    UPDATE plans
+                    SET (plan_name = ?, period_days = ?, amount = ?)
+                    WHERE plan_id = ?
+                    """,
+                    (updated_plan_name, updated_period_days, updated_amount, str(plan_id)),
+                )
 
-        conn.commit()
+                conn.commit()
 
-        return self.get(plan_id)
+            return self.get(plan_id)
 
     def delete(self, plan_id = str | UUID):
         with get_connection() as conn:
