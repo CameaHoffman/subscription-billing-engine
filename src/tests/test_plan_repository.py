@@ -115,9 +115,6 @@ def test_create_plan_failure_amount_negative(setup_test_db):
 
 def test_get_plan_success():
 
-    repo = SQLitePlanRepository
-
-    plan
     pass
 
 def test_get_plan_failure_invalid_plan_id():
