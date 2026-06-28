@@ -10,6 +10,7 @@ def setup_test_db():
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM customers")
+        cursor.execute("DELETE FROM plans")
         conn.commit()
 
     yield
@@ -17,5 +18,6 @@ def setup_test_db():
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM customers")
+        cursor.execute("DELETE FROM plans")
         conn.commit()
 

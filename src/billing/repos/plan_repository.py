@@ -144,10 +144,10 @@ class SQLitePlanRepository:
                 cursor.execute(
                     """
                     UPDATE plans
-                    SET (plan_name = ?, period_days = ?, amount = ?)
+                    SET plan_name = ?, period_days = ?, amount = ?
                     WHERE plan_id = ?
                     """,
-                    (updated_plan_name, updated_period_days, updated_amount, str(plan_id)),
+                    (updated_plan_name, updated_period_days, str(updated_amount), str(plan_id)),
                 )
 
                 conn.commit()

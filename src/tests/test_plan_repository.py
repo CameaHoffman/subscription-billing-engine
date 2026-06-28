@@ -113,29 +113,95 @@ def test_create_plan_failure_amount_negative(setup_test_db):
 
 # ------ GET PLAN TESTS ------
 
-def test_get_plan_success():
+def test_get_plan_success(setup_test_db):
 
-    pass
+    repo = SQLitePlanRepository()
 
-def test_get_plan_failure_invalid_plan_id():
-    pass
+    plan = repo.create(plan_name = "plan 01",
+                       period_days=30,
+                       amount=Decimal("10.00")
+                       )
 
-def test_get_plan_empty_field_returns_none():
-    pass
+    result = repo.get(plan.plan_id)
+
+    assert result is not None
+    assert result.plan_id == plan.plan_id
+    assert result.plan_name == "plan 01"
+    assert result.period_days == 30
+    assert result.amount == Decimal("10.00")
+
+def test_get_plan_returns_none_when_plan_not_found(setup_test_db):
+
+    repo = SQLitePlanRepository()
+
+    fake_id = uuid4()
+
+    result = repo.get(fake_id)
+
+    assert result is None 
+
+def test_get_plan_empty_field_returns_error(setup_test_db):
+    
+    repo = SQLitePlanRepository()
+
+    with pytest.raises(ValueError):
+        repo.get(None)
 
 # ------ GET PLAN LIST TESTS ------
 
-def test_get_plan_list_sucess():
-    pass
+def test_get_plan_list_sucess(setup_test_db):
+    
+    repo = SQLitePlanRepository()
 
-def test_get_plan_returns_empty_list():
-    pass
+    repo.create(plan_name = "plan 01",
+                period_days=30,
+                amount=Decimal("10.00")
+                )
+    
+    repo.create(plan_name = "plan 02",
+                period_days=30,
+                amount=Decimal("25.00")
+                )
+
+    result = repo.list()
+    plan_names = [c.plan_name for c in result]
+
+    assert result is not None
+    assert len(result) == 2
+    assert set(plan_names) == {"plan 01", "plan 02"}
+
+def test_get_plan_returns_empty_list(setup_test_db):
+
+    repo = SQLitePlanRepository()
+
+    result = repo.list()
+
+    assert result is not None
+    assert result == []
+    assert len(result) == 0
 
 # ------ PATCH/UPDATE PLAN TESTS ------
-def test_plan_update_success():
-    pass
+def test_plan_update_success(setup_test_db):
+     
+    repo = SQLitePlanRepository()
 
-def test_plan_update_failure_invalid_plan_id():
+    plan = repo.create(plan_name="plan 01",
+                       period_days=30,
+                       amount=Decimal("10.00")
+                       )
+     
+    repo.update(
+        plan_id=plan.plan_id,
+        plan_name="plan 02")
+     
+    updated = repo.get(plan.plan_id)
+
+    assert updated is not None
+    assert updated.plan_name == "plan 02"
+    assert updated.period_days == 30
+    assert updated.amount == Decimal("10.00")
+
+def test_plan_update_failure_invalid_plan_id(setup_test_db):
     pass
 
 def test_plan_update_failure_invalid_plan_name():
