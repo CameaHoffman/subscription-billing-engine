@@ -108,27 +108,32 @@ def test_update_customer_success(setup_test_db):
     updated = repo.get(customer.customer_id)
 
     assert updated is not None
+    assert updated.customer_id == customer.customer_id
     assert updated.email == "new@example.com"
     assert updated.first_name == "Jane"
     assert updated.last_name == "Doe"
 
-def test_update_customer_failure_with_invalid_id(setup_test_db):
+def test_update_customer_returns_none_when_customer_not_found(setup_test_db):
 
     repo = SQLiteCustomerRepository()
 
-    customer = repo.create(email="test@example.com")
-
-    result = repo.update(
-        customer_id=uuid4(),
-        email="new@example.com"
-    )
+    result = repo.update(customer_id=uuid4())
 
     assert result is None
 
-    existing = repo.get(customer.customer_id)
+def test_update_customer_failure_when_customer_id_is_none(setup_test_db):
 
-    assert existing is not None
-    assert existing.email == "test@example.com"
+    repo = SQLiteCustomerRepository()
+
+    with pytest.raises(ValueError):
+        repo.update(customer_id=None)
+
+def test_update_customer_failure_on_empty_customer_id_string(setup_test_db):
+
+    repo = SQLiteCustomerRepository()
+
+    with pytest.raises(ValueError):
+        repo.update(customer_id="")
 
 # ------ DELETE CUSTOMER TESTS ------
 

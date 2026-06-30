@@ -201,19 +201,109 @@ def test_plan_update_success(setup_test_db):
     assert updated.period_days == 30
     assert updated.amount == Decimal("10.00")
 
-def test_plan_update_failure_invalid_plan_id(setup_test_db):
-    pass
+def test_plan_update_failure_when_plan_id_is_empty_string(setup_test_db):
 
-def test_plan_update_failure_invalid_plan_name():
-    pass
+    repo = SQLitePlanRepository()
 
-def test_plan_update_failure_invalid_period_days():
-    pass
+    with pytest.raises(ValueError):
+        repo.update(plan_id="")
 
-def test_plan_update_failure_invalid_amount():
-    pass
+def test_plan_update_failure_when_plan_id_is_none(setup_test_db):
+
+    repo = SQLitePlanRepository()
+
+    with pytest.raises(ValueError):
+        repo.update(plan_id=None)
+
+def test_plan_update_returns_none_when_plan_not_found(setup_test_db):
+
+    repo = SQLitePlanRepository()
+
+    invalid_plan_id = uuid4()
+
+    result = repo.update(plan_id=invalid_plan_id)
+
+    assert result is None
+
+def test_plan_update_failure_invalid_plan_name(setup_test_db):
+    
+    repo = SQLitePlanRepository()
+
+    plan = repo.create(plan_name="plan 01",
+                       period_days=30,
+                       amount=Decimal("10.00")
+                       )
+     
+    with pytest.raises(ValueError):
+
+        repo.update(
+        plan_id=plan.plan_id,
+        plan_name="")
+
+def test_plan_update_failure_when_period_days_zero(setup_test_db):
+
+    repo = SQLitePlanRepository()
+
+    plan = repo.create(plan_name="plan 01",
+                       period_days=30,
+                       amount=Decimal("10.00")
+                       )
+    
+    with pytest.raises(ValueError):
+        repo.update(
+            plan_id=plan.plan_id,
+            plan_name="plan 01",
+            period_days=0
+        )
+
+def test_plan_update_failure_when_period_days_negative(setup_test_db):
+
+    repo = SQLitePlanRepository()
+
+    plan = repo.create(plan_name="plan 01",
+                       period_days=30,
+                       amount=Decimal("10.00")
+                       )
+    
+    with pytest.raises(ValueError):
+        repo.update(
+            plan_id=plan.plan_id,
+            plan_name="plan 01",
+            period_days=-1
+        )
+
+def test_plan_update_failure_when_amount_zero(setup_test_db):
+
+    repo = SQLitePlanRepository()
+
+    plan = repo.create(plan_name="plan 01",
+                       period_days=30,
+                       amount=Decimal("10.00")
+                       )
+    
+    with pytest.raises(ValueError):
+        repo.update(
+            plan_id=plan.plan_id,
+            plan_name="plan 01",
+            amount=Decimal("0.00")
+        )
 
 
+def test_plan_update_failure_when_amount_negative():
+   
+    repo = SQLitePlanRepository()
+
+    plan = repo.create(plan_name="plan 01",
+                       period_days=30,
+                       amount=Decimal("10.00"))
+    
+    with pytest.raises(ValueError):
+        repo.update(
+            plan_id=plan.plan_id,
+            plan_name="plan 01",
+            amount=Decimal("-10.00")
+        )
+    
 # ------ DELETE PLAN TESTS ------
 
 def test_delete_plan_success():

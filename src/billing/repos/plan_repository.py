@@ -119,6 +119,9 @@ class SQLitePlanRepository:
             period_days: Optional[int] = None,
             amount: Optional[Decimal] = None,
     ) -> Optional[PlanRecord]:
+            
+            if not plan_id:
+                raise ValueError("Invalid plan ID.")
         
             existing_plan = self.get(plan_id)
 
@@ -134,6 +137,9 @@ class SQLitePlanRepository:
             
             if not updated_period_days:
                 raise ValueError("Invalid entry.")
+            
+            if updated_period_days <=0:
+                raise ValueError("Period days must be greater than zero.")
             
             if updated_amount <= 0:
                 raise ValueError("Amount must be greater than zero.")

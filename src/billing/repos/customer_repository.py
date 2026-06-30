@@ -122,6 +122,9 @@ class SQLiteCustomerRepository:
             first_name: Optional[str] = None,
             last_name: Optional[str] = None) -> Optional[CustomerRecord]:
         
+        if not customer_id:
+            raise ValueError("Invalid customer ID.")
+        
         existing_customer = self.get(customer_id)
 
         if existing_customer is None:
