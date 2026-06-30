@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import List, Optional
 from uuid import UUID, uuid4
 from decimal import Decimal
-from billing.repos.customer_repository import SQLiteCustomerRepository
 
 from billing.repos.database import get_connection
 
