@@ -161,6 +161,7 @@ class SQLitePlanRepository:
             return self.get(plan_id)
 
     def delete(self, plan_id = str | UUID):
+
         with get_connection() as conn:
             cursor = conn.cursor()
 
@@ -169,7 +170,7 @@ class SQLitePlanRepository:
                 DELETE FROM plans
                 WHERE plan_id = ?
                 """,
-                (str(plan_id)),
+                (str(plan_id),)
             )
             
         deleted = cursor.rowcount

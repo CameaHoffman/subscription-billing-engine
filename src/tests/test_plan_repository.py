@@ -2,7 +2,6 @@ import pytest
 from uuid import UUID, uuid4
 from decimal import Decimal
 from billing.repos.plan_repository import SQLitePlanRepository
-from billing.repos.customer_repository import SQLiteCustomerRepository
 
 # CRUD operation tests
 
@@ -149,7 +148,7 @@ def test_get_plan_empty_field_returns_error(setup_test_db):
 
 # ------ GET PLAN LIST TESTS ------
 
-def test_get_plan_list_sucess(setup_test_db):
+def test_get_plan_list_success(setup_test_db):
     
     repo = SQLitePlanRepository()
 
@@ -289,7 +288,7 @@ def test_plan_update_failure_when_amount_zero(setup_test_db):
         )
 
 
-def test_plan_update_failure_when_amount_negative():
+def test_plan_update_failure_when_amount_negative(setup_test_db):
    
     repo = SQLitePlanRepository()
 
@@ -306,11 +305,40 @@ def test_plan_update_failure_when_amount_negative():
     
 # ------ DELETE PLAN TESTS ------
 
-def test_delete_plan_success():
-    pass
+def test_delete_plan_success(setup_test_db):
 
-def test_delete_plan_not_found():
-    pass
+    repo = SQLitePlanRepository()
 
-def test_delete_plan_twice():
-    pass
+    plan = repo.create(plan_name="plan 01",
+                       period_days=30,
+                       amount=Decimal("10.00")
+                       )
+    
+    result = repo.delete(plan.plan_id)
+
+    assert result is True
+
+    deleted = repo.get(plan.plan_id)
+
+    assert deleted is None
+
+def test_delete_plan_not_found(setup_test_db):
+
+    repo = SQLitePlanRepository()
+
+    result = repo.delete(plan_id=uuid4())
+
+    assert result is False
+
+def test_delete_plan_twice(setup_test_db):
+
+    repo = SQLitePlanRepository()
+
+    plan = repo.create(plan_name="plan 01",
+                       period_days=30,
+                       amount=Decimal("10.00")
+                       )
+
+    assert repo.delete(plan.plan_id) is True
+    assert repo.delete(plan.plan_id) is False
+
