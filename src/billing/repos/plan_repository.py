@@ -54,6 +54,9 @@ class SQLitePlanRepository:
             conn.commit()
 
         created = self.get(plan_id)
+
+     #TO-DO: REPLACE ASSERT WITH ERROR HANDLING
+     
         assert created is not None
         return created
 

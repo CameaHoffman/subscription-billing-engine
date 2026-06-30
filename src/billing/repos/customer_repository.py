@@ -41,6 +41,9 @@ class SQLiteCustomerRepository:
             conn.commit()
 
         created = self.get(customer_id)
+
+ #TO-DO: REPLACE ASSERT WITH ERROR HANDLING
+ 
         assert created is not None
         return created
     
