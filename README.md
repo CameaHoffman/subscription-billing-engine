@@ -1,149 +1,236 @@
 # Subscription Billing Engine
 
-A domain-focused subscription billing simulator built to model real-world billing logic and lifecycle rules.
+> **🚧 SQL Migration in Progress**
+>
+> I'm currently migrating this project from an in-memory domain model to a layered architecture with SQLite persistence. The migration is being completed incrementally through small, test-driven commits to demonstrate software design, repository patterns, SQL integration, and test-driven development.
 
-This project isolates business logic from infrastructure and demonstrates how subscription systems handle billing periods, cancellation semantics, invoice generation, and identity management.
+## Current Progress
 
----
+* ✅ SQLite database schema
+* ✅ Customer repository + tests
+* ✅ Plan repository + tests
+* 🚧 Subscription repository + tests (in progress)
+* ⏳ Invoice repository
+* ⏳ Line Item repository
+* ⏳ Service layer
+* ⏳ FastAPI API layer
 
-## Core Concepts
-
-The system models four primary domain entities:
-
-### Customer
-- UUID-based identity
-- Email address
-- Optional name fields
-- Auto-generated UTC `created_at` timestamp
-
-### Plan
-- `plan_id`
-- Billing period length (`period_days`)
-- Recurring amount
-
-### Subscription
-- References a `Customer` by UUID
-- Tracks billing period start and end
-- Maintains lifecycle state:
-  - `INACTIVE`
-  - `ACTIVE`
-- Supports:
-  - Cancel at period end
-  - Immediate cancellation
-- Prevents duplicate billing within the same period
-
-### Invoice
-- References `Customer` by UUID
-- Billing period start and end
-- Line items
-- Computed total
-- Default status: `UNPAID`
-
-### LineItem
-- Description
-- Amount
-- Quantity
-- Subtotal calculation
+> **Note:** This project is intentionally developed through small, incremental commits to demonstrate Python proficiency, software design, repository patterns, SQL integration, and test-driven development. AI has been used as a design discussion partner rather than a code generator.
 
 ---
 
-## Implemented Business Rules
+A domain-first subscription billing engine built to model real-world billing systems while demonstrating clean architecture, separation of concerns, and test-driven development.
 
-- Monthly billing cycles
-- Invoice generation only when subscription is `ACTIVE`
-- Idempotent invoice generation per billing period
-- Cancel at period end:
-  - Current period still bills
-  - Future periods do not
-- Immediate cancellation:
-  - Subscription becomes inactive immediately
-- Invoice totals are derived from line items
+The project separates business logic from persistence, making the domain layer independent of infrastructure and allowing the application to evolve from an in-memory model into a production-style backend architecture.
 
 ---
 
-## Architecture
+# Core Concepts
 
-The project follows a layered domain-first structure:
+The system models five primary domain entities.
 
+## Customer
+
+* UUID-based identity
+* Email address
+* Optional name fields
+* UTC `created_at` timestamp
+
+## Plan
+
+* UUID-based identity
+* Billing period length (`period_days`)
+* Recurring billing amount
+
+## Subscription
+
+* References a Customer
+* References a Plan
+* Billing start date
+* Optional end date
+* Lifecycle status (`active`, `canceled`)
+* Supports immediate or scheduled cancellation through domain behavior
+* Designed to preserve historical subscription records rather than deleting them
+
+## Invoice
+
+* References a Customer
+* Billing period
+* Line items
+* Computed total
+* Default status of `UNPAID`
+
+## Line Item
+
+* Description
+* Amount
+* Quantity
+* Calculated subtotal
+
+---
+
+# Business Rules
+
+Current business rules include:
+
+* Monthly recurring billing
+* Invoice generation only for active subscriptions
+* One invoice per subscription per billing period
+* Immediate cancellation
+* End-of-period cancellation
+* Invoice totals derived from line items
+* UUID identity across all entities
+
+---
+
+# Architecture
+
+The project follows a layered architecture.
+
+```text
+API Layer (planned)
+        ↓
+Service Layer (planned)
+        ↓
+Domain Layer
+        ↓
+Repository / Persistence Layer
+        ↓
+SQLite Database
 ```
+
+Current project structure:
+
+```text
 src/
-  billing/
-    domain/
-      customer.py
-      plan.py
-      subscription.py
-      invoice.py
-      line_item.py
-      billingengine.py
+└── billing/
+    ├── domain/
+    ├── repos/
+    ├── database/
+    └── tests/
 ```
 
-- `domain/` contains pure business logic
-- No database
-- No framework dependencies
-- Fully unit-tested
+### Domain Layer
 
-This keeps billing logic isolated and easy to extend.
+Contains pure business logic.
 
----
+* No SQL
+* No framework dependencies
+* Business rules only
 
-## Testing
+### Repository Layer
 
-- Pytest-based test suite
-- Explicit rule-based tests
-- Edge case coverage (inactive subscriptions, duplicate billing, cancellation timing)
-- 99% test coverage across domain logic
+Implements the Repository pattern for persistence.
 
-Tests are written to read like requirements and validate business behavior rather than implementation details.
+Repositories are responsible only for:
 
----
+* Creating records
+* Retrieving records
+* Listing records
+* Updating persisted state
 
-## Example Flow
+Business decisions remain inside the domain layer.
 
-1. Create a `Customer`
-2. Create a `Plan`
-3. Create a `Subscription`
-4. Activate subscription
-5. Generate invoice for billing period
-6. Cancel subscription (immediate or end-of-period)
+Current repositories:
+
+* Customer Repository
+* Plan Repository
+* Subscription Repository (in progress)
 
 ---
 
-## Design Decisions
+# Persistence
 
-- UUID-based identity across all domain models
-- Timezone-aware timestamps (UTC)
-- Explicit cancellation methods (no boolean overloads)
-- Idempotent billing protection using tracked billing periods
-- Business logic isolated from persistence and API layers
+The project is currently being migrated to SQLite.
 
----
+The persistence layer maps domain objects to relational tables while maintaining a clear separation between business logic and storage.
 
-## Future Enhancements (Roadmap)
+Current tables include:
 
-- Trial periods and automatic conversion
-- Mid-cycle plan upgrades/downgrades with proration
-- Credit and refund system
-- Ledger / audit trail model
-- Event-driven billing service layer
-- Persistence layer (SQL or repository abstraction)
-- API or CLI interface
+* Customers
+* Plans
+* Subscriptions
+
+Invoice and Line Item persistence is currently under development.
 
 ---
 
-## How to Run Tests
+# Testing
 
-```
+The project is developed using test-driven development.
+
+Current testing includes:
+
+* Pytest
+* Repository CRUD tests
+* Domain behavior tests
+* Validation testing
+* Edge cases
+* Database persistence testing
+
+Tests are designed to validate business behavior rather than implementation details.
+
+---
+
+# Example Workflow
+
+1. Create a Customer
+2. Create a Plan
+3. Create a Subscription
+4. Activate the subscription
+5. Generate invoices for billing periods
+6. Cancel the subscription
+7. Preserve billing history
+
+---
+
+# Design Principles
+
+* Domain-first architecture
+* Separation of concerns
+* Repository pattern
+* Test-driven development
+* UUID-based identities
+* Explicit domain behavior over CRUD-centric design
+* Incremental, commit-driven development
+* Extensible architecture for future APIs and services
+
+---
+
+# Roadmap
+
+Planned enhancements include:
+
+* Invoice repository
+* Line Item repository
+* Billing service layer
+* FastAPI REST API
+* Background billing scheduler
+* Trial periods
+* Plan upgrades and downgrades
+* Proration support
+* Credits and refunds
+* Audit logging
+* Docker deployment
+
+---
+
+# Running Tests
+
+```bash
 pytest --cov=src --cov-report=term-missing
 ```
 
 ---
 
-## Why This Project
+# Why This Project
 
-Subscription billing systems are deceptively complex.  
-This project focuses on modeling the business rules clearly, testing them thoroughly, and keeping the architecture clean and extensible.
+Subscription billing systems are deceptively complex.
 
+This project explores how to model billing domains using clean architecture principles while demonstrating object-oriented design, repository patterns, SQL persistence, and test-driven development.
+
+Rather than focusing only on CRUD operations, the project emphasizes modeling business behavior and keeping domain logic independent from infrastructure.
 
 ---
-Created by Camea Hoffman
 
+Created by **Camea Hoffman**
