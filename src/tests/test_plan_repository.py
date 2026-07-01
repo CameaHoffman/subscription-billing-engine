@@ -175,9 +175,7 @@ def test_get_plan_returns_empty_list(setup_test_db):
 
     result = repo.list()
 
-    assert result is not None
     assert result == []
-    assert len(result) == 0
 
 # ------ PATCH/UPDATE PLAN TESTS ------
 def test_plan_update_success(setup_test_db):

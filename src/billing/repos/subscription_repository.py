@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from uuid import UUID, uuid4
 from datetime import date
+from typing import List
 
 from billing.repos.database import get_connection
 from billing.repos.customer_repository import SQLiteCustomerRepository
@@ -95,8 +96,31 @@ class SQLiteSubscriptionRepository:
                 plan_id= UUID(row["plan_id"]),
             )
 
-    def list():
-        pass
+    def list(self, limit: int=50, offset: int=0) -> List[SubscriptionRecord]:
+
+        with get_connection() as conn:
+            cursor = conn.cursor()
+
+            cursor.execute(
+                """
+                SELECT subscription_id, customer_id, start_date, plan_id
+                FROM subscriptions
+                ORDER BY subscription_id
+                LIMIT ? OFFSET ?
+                """,
+                (limit, offset,)
+            )
+
+            rows = cursor.fetchall()
+
+            return [SubscriptionRecord(
+                subscription_id=UUID(row["subscription_id"]),
+                customer_id= UUID(row["customer_id"]),
+                start_date= date.fromisoformat(row["start_date"]),
+                plan_id= UUID(row["plan_id"]),
+            )
+            for row in rows
+            ]
 
     def update():
         pass

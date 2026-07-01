@@ -143,3 +143,44 @@ def test_get_subscription_returns_none_when_subscription_id_not_found(setup_test
     result = subscription_repo.get(subscription_id=uuid4())
 
     assert result is None
+
+# ------ GET SUBSCRIPTION LIST ------
+
+def test_get_subscription_list_success(setup_test_db):
+
+    subscription_repo = SQLiteSubscriptionRepository()
+    customer_repo = SQLiteCustomerRepository()
+    plan_repo = SQLitePlanRepository()
+
+    customer_1 = customer_repo.create(email="test@example.com")
+    customer_2 = customer_repo.create(email="test2@example.com")
+
+    plan = plan_repo.create(plan_name="Monthly",
+                                    period_days=30,
+                                    amount=Decimal("10.00"))
+
+    subscription_1 = subscription_repo.create(customer_id=customer_1.customer_id,
+                                              start_date=date.today(),
+                                              plan_id=plan.plan_id
+                                              )
+    
+    subscription_2 = subscription_repo.create(customer_id=customer_2.customer_id,
+                                              start_date=date.today(),
+                                              plan_id=plan.plan_id)
+    
+    result = subscription_repo.list()
+    subscriptions = [c.subscription_id for c in result]
+
+    assert result is not None
+    assert len(result) == 2
+    assert set(subscriptions) == {subscription_1.subscription_id,
+                                  subscription_2.subscription_id}
+
+def test_get_subscription_list_returns_empty_list(setup_test_db):
+    
+    subscription_repo = SQLiteSubscriptionRepository()
+
+    result = subscription_repo.list()
+
+    assert result == []
+
