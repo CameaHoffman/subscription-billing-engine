@@ -25,12 +25,15 @@ def test_create_subscription_success(setup_test_db):
     subscription = subscription_repo.create(
         customer_id=customer.customer_id,
         start_date=date.today(),
+        end_date=None,
         plan_id=plan.plan_id,
+        status="active",
     )
 
     assert subscription.customer_id is not None
     assert subscription.customer_id == customer.customer_id
     assert subscription.start_date == date.today()
+    assert subscription.end_date == None
     assert subscription.plan_id == plan.plan_id
 
 def test_create_subscription_invalid_customer_id(setup_test_db):
@@ -46,7 +49,9 @@ def test_create_subscription_invalid_customer_id(setup_test_db):
         subscription_repo.create(
             customer_id="",
             start_date=date.today(),
+            end_date=None,
             plan_id=plan.plan_id,
+            status="active"
             )
         
 def test_create_subscription_customer_id_not_found(setup_test_db):
@@ -62,7 +67,9 @@ def test_create_subscription_customer_id_not_found(setup_test_db):
         subscription_repo.create(
             customer_id=uuid4(),
             start_date=date.today(),
+            end_date=None,
             plan_id=plan.plan_id,
+            status="active",
             )
 
 def test_create_subscription_invalid_plan_id(setup_test_db):
@@ -80,7 +87,9 @@ def test_create_subscription_invalid_plan_id(setup_test_db):
         subscription_repo.create(
             customer_id=customer.customer_id,
             start_date=date.today(),
+            end_date=None,
             plan_id="",
+            status="active"
             )
         
 def test_create_subscription_plan_id_not_found(setup_test_db):
@@ -99,7 +108,9 @@ def test_create_subscription_plan_id_not_found(setup_test_db):
         subscription_repo.create(
             customer_id=customer.customer_id,
             start_date=date.today(),
+            end_date=None,
             plan_id=uuid4(),
+            status="active"
             )
 
 # ------ GET SUBSCRIPTION TESTS ------
@@ -119,7 +130,9 @@ def test_get_subscription_success(setup_test_db):
     subscription = subscription_repo.create(
         customer_id=customer.customer_id,
         start_date=date.today(),
+        end_date=None,
         plan_id=plan.plan_id,
+        status="active"
         )
     
     result = subscription_repo.get(subscription.subscription_id)
@@ -127,7 +140,9 @@ def test_get_subscription_success(setup_test_db):
     assert result.subscription_id == subscription.subscription_id
     assert result.customer_id == customer.customer_id
     assert result.start_date == subscription.start_date
+    assert result.end_date == subscription.end_date
     assert result.plan_id == plan.plan_id
+    assert result.status == subscription.status
 
 def test_get_subscription_invalid_subscription_id(setup_test_db):
 
@@ -161,12 +176,17 @@ def test_get_subscription_list_success(setup_test_db):
 
     subscription_1 = subscription_repo.create(customer_id=customer_1.customer_id,
                                               start_date=date.today(),
-                                              plan_id=plan.plan_id
+                                              end_date=None,
+                                              plan_id=plan.plan_id,
+                                              status="active"
                                               )
     
     subscription_2 = subscription_repo.create(customer_id=customer_2.customer_id,
                                               start_date=date.today(),
-                                              plan_id=plan.plan_id)
+                                              end_date=None,
+                                              plan_id=plan.plan_id,
+                                              status="active"
+                                              )
     
     result = subscription_repo.list()
     subscriptions = [c.subscription_id for c in result]
@@ -183,4 +203,13 @@ def test_get_subscription_list_returns_empty_list(setup_test_db):
     result = subscription_repo.list()
 
     assert result == []
+
+# ------ UPDATE SUBSCRIPTION ------
+
+# Currently no need for subscription update operations
+
+# ------ CANCEL SUBSCRIPTION ------ 
+
+
+
 

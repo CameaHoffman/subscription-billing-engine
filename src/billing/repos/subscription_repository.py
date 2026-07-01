@@ -14,7 +14,9 @@ class SubscriptionRecord:
     subscription_id: UUID
     customer_id: UUID
     start_date: date
+    end_date: date | None
     plan_id: UUID
+    status: str
 
 class SQLiteSubscriptionRepository:
     def create(
@@ -22,6 +24,8 @@ class SQLiteSubscriptionRepository:
             customer_id: str,
             start_date: date,
             plan_id: str,
+            end_date: date | None = None,
+            status: str = 'active'
             ) -> SubscriptionRecord:
 
         if not customer_id:
@@ -49,10 +53,18 @@ class SQLiteSubscriptionRepository:
 
             cursor.execute(
                 """
-                INSERT INTO subscriptions (subscription_id, customer_id, start_date, plan_id)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO subscriptions (subscription_id, customer_id, 
+                start_date, end_date, plan_id, status
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
-                (str(subscription_id), str(customer_id), start_date.isoformat(), str(plan_id))
+                (str(subscription_id), 
+                 str(customer_id), 
+                 start_date.isoformat(), 
+                 end_date.isoformat() if end_date else None, 
+                 str(plan_id), 
+                 status
+                 )
                 )
             
             conn.commit()
@@ -77,7 +89,7 @@ class SQLiteSubscriptionRepository:
 
             cursor.execute(
                 """
-                SELECT subscription_id, customer_id, start_date, plan_id
+                SELECT subscription_id, customer_id, start_date, end_date, plan_id, status
                 FROM subscriptions
                 WHERE subscription_id = ?
                 """,
@@ -93,7 +105,13 @@ class SQLiteSubscriptionRepository:
                 subscription_id= UUID(row["subscription_id"]),
                 customer_id = UUID(row["customer_id"]),
                 start_date= date.fromisoformat(row["start_date"]),
+                end_date= (
+                    date.fromisoformat(row["end_date"]) 
+                    if row["end_date"]
+                    else None
+                    ),
                 plan_id= UUID(row["plan_id"]),
+                status= row["status"],
             )
 
     def list(self, limit: int=50, offset: int=0) -> List[SubscriptionRecord]:
@@ -103,7 +121,7 @@ class SQLiteSubscriptionRepository:
 
             cursor.execute(
                 """
-                SELECT subscription_id, customer_id, start_date, plan_id
+                SELECT subscription_id, customer_id, start_date, end_date, plan_id, status
                 FROM subscriptions
                 ORDER BY subscription_id
                 LIMIT ? OFFSET ?
@@ -117,15 +135,18 @@ class SQLiteSubscriptionRepository:
                 subscription_id=UUID(row["subscription_id"]),
                 customer_id= UUID(row["customer_id"]),
                 start_date= date.fromisoformat(row["start_date"]),
+                end_date= (
+                    date.fromisoformat(row["end_date"])
+                    if (row["end_date"])
+                    else None
+                    ),
                 plan_id= UUID(row["plan_id"]),
+                status= row["status"]
             )
             for row in rows
             ]
 
-    def update():
-        pass
-
-    def delete():
+    def cancel():
         pass
 
     def reset():

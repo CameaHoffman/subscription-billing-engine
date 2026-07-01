@@ -35,7 +35,9 @@ def init_db():
                        subscription_id TEXT PRIMARY KEY,
                        customer_id TEXT NOT NULL,
                        start_date TIMESTAMP,
+                       end_date TIMESTAMP,
                        plan_id TEXT NOT NULL,
+                       status TEXT NOT NULL DEFAULT 'active',
                        FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
                        FOREIGN KEY (plan_id) REFERENCES plans(plan_id)
                        )
